@@ -1,0 +1,93 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/user_model.dart';
+import '../models/match_model.dart';
+
+class DatabaseService {
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  Future<void> saveUser(UserModel user) async {
+    await _db.collection('users').doc(user.prn).set({
+      'prn': user.prn,
+      'name': user.name,
+      'gender': user.gender,
+      'year': user.year,
+      'branch': user.branch,
+      'bio': user.bio,
+      'tags': user.tags,
+      'goals': user.goals,
+      'prefGender': user.prefGender,
+      'prefYear': user.prefYear,
+      'photoPath': user.photoPath,
+      'isAdmin': user.prn == '12413129', // Admin Privileges
+    }, SetOptions(merge: true));
+  }
+
+  Future<UserModel?> getUser(String prn) async {
+    final doc = await _db.collection('users').doc(prn).get();
+    if (!doc.exists) return null;
+    final data = doc.data()!;
+    final user = UserModel(
+      prn: data['prn'] ?? prn,
+      name: data['name'] ?? '',
+      password: '', // Kept secure via FirebaseAuth
+      gender: data['gender'] ?? '',
+      year: data['year'] ?? '',
+      branch: data['branch'] ?? '',
+    );
+    user.bio = data['bio'] ?? '';
+    user.tags = List<String>.from(data['tags'] ?? []);
+    user.goals = List<String>.from(data['goals'] ?? []);
+    user.prefGender = data['prefGender'] ?? 'Any';
+    user.prefYear = data['prefYear'] ?? 'Any';
+    user.photoPath = data['photoPath'] ?? '';
+    return user;
+  }
+
+  Future<List<UserModel>> getAllUsers() async {
+    final snapshot = await _db.collection('users').get();
+    final users = <UserModel>[];
+    for (var doc in snapshot.docs) {
+      final data = doc.data();
+      final user = UserModel(
+        prn: data['prn'] ?? '',
+        name: data['name'] ?? '',
+        password: '',
+        gender: data['gender'] ?? '',
+        year: data['year'] ?? '',
+        branch: data['branch'] ?? '',
+      );
+      users.add(user);
+    }
+    return users;
+  }
+
+  Future<void> saveMatch(MatchModel match) async {
+    await _db.collection('matches').doc(match.matchId).set({
+      'matchId': match.matchId,
+      'peerPrn': match.peerPrn,
+      'peerName': match.peerName,
+      'timestamp': match.timestamp,
+    }, SetOptions(merge: true));
+
+    // Save messages in a subcollection
+    for (var message in match.messages) {
+      await _db
+          .collection('matches')
+          .doc(match.matchId)
+          .collection('messages')
+          .doc(DateTime.now().millisecondsSinceEpoch.toString())
+          .set({
+        'text': message,
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+      });
+    }
+  }
+
+  Stream<QuerySnapshot> getAllMatches() {
+    return _db.collection('matches').snapshots();
+  }
+
+  Stream<QuerySnapshot> getMatchMessages(String matchId) {
+    return _db.collection('matches').doc(matchId).collection('messages').orderBy('timestamp').snapshots();
+  }
+}
