@@ -209,7 +209,7 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _onMessageReceived(MapEntry<String, String> entry) {
+  void _onMessageReceived(MapEntry<String, String> entry) async {
     final prn = entry.key;
     final message = entry.value;
     final box = Hive.box<MatchModel>('matches');
@@ -217,7 +217,8 @@ class AppProvider extends ChangeNotifier {
       if (match.peerPrn == prn) {
         match.messages.add('them:$message');
         match.save();
-        _db.saveMatch(match);
+        await _db.saveMatch(match);
+        await _db.addMessage(match.matchId, 'them:$message');
         final idx = _matches.indexWhere((m) => m.peerPrn == prn);
         if (idx != -1) _matches[idx] = match;
         notifyListeners();
@@ -273,6 +274,7 @@ class AppProvider extends ChangeNotifier {
     match.messages.add('me:$text');
     await match.save();
     await _db.saveMatch(match);
+    await _db.addMessage(match.matchId, 'me:$text');
     final idx = _matches.indexWhere((m) => m.matchId == match.matchId);
     if (idx != -1) _matches[idx] = match;
     notifyListeners();

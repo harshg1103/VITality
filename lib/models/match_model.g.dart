@@ -2,6 +2,10 @@
 
 part of 'match_model.dart';
 
+// **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
+
 class MatchModelAdapter extends TypeAdapter<MatchModel> {
   @override
   final int typeId = 1;
@@ -16,11 +20,11 @@ class MatchModelAdapter extends TypeAdapter<MatchModel> {
       matchId: fields[0] as String,
       peerPrn: fields[1] as String,
       peerName: fields[2] as String,
-      peerPhotoPath: fields[3] as String? ?? '',
-      peerTags: (fields[4] as List?)?.cast<String>() ?? [],
-      peerYear: fields[5] as String? ?? '',
-      peerBranch: fields[6] as String? ?? '',
-      messages: (fields[7] as List?)?.cast<String>() ?? [],
+      peerPhotoPath: fields[3] as String,
+      peerTags: (fields[4] as List?)?.cast<String>(),
+      peerYear: fields[5] as String,
+      peerBranch: fields[6] as String,
+      messages: (fields[7] as List?)?.cast<String>(),
       timestamp: fields[8] as int,
     );
   }

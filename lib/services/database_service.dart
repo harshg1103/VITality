@@ -15,6 +15,8 @@ class DatabaseService {
       'bio': user.bio,
       'tags': user.tags,
       'goals': user.goals,
+      'hobbies': user.hobbies,
+      'technicalSkills': user.technicalSkills,
       'prefGender': user.prefGender,
       'prefYear': user.prefYear,
       'photoPath': user.photoPath,
@@ -37,6 +39,8 @@ class DatabaseService {
     user.bio = data['bio'] ?? '';
     user.tags = List<String>.from(data['tags'] ?? []);
     user.goals = List<String>.from(data['goals'] ?? []);
+    user.hobbies = List<String>.from(data['hobbies'] ?? []);
+    user.technicalSkills = List<String>.from(data['technicalSkills'] ?? []);
     user.prefGender = data['prefGender'] ?? 'Any';
     user.prefYear = data['prefYear'] ?? 'Any';
     user.photoPath = data['photoPath'] ?? '';
@@ -68,19 +72,17 @@ class DatabaseService {
       'peerName': match.peerName,
       'timestamp': match.timestamp,
     }, SetOptions(merge: true));
+  }
 
-    // Save messages in a subcollection
-    for (var message in match.messages) {
-      await _db
-          .collection('matches')
-          .doc(match.matchId)
-          .collection('messages')
-          .doc(DateTime.now().millisecondsSinceEpoch.toString())
-          .set({
-        'text': message,
-        'timestamp': DateTime.now().millisecondsSinceEpoch,
-      });
-    }
+  Future<void> addMessage(String matchId, String message) async {
+    await _db
+        .collection('matches')
+        .doc(matchId)
+        .collection('messages')
+        .add({
+      'text': message,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
   }
 
   Stream<QuerySnapshot> getAllMatches() {

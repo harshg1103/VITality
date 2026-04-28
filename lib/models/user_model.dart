@@ -43,6 +43,12 @@ class UserModel extends HiveObject {
   @HiveField(12)
   String jwtToken = '';
 
+  @HiveField(13)
+  List<String> hobbies = [];
+
+  @HiveField(14)
+  List<String> technicalSkills = [];
+
   UserModel({
     required this.prn,
     required this.name,
@@ -57,8 +63,12 @@ class UserModel extends HiveObject {
     this.prefGender = 'Any',
     this.prefYear = 'Any',
     this.jwtToken = '',
+    List<String>? hobbies,
+    List<String>? technicalSkills,
   }) {
     this.tags = tags ?? [];
     this.goals = goals ?? [];
+    this.hobbies = hobbies ?? [];
+    this.technicalSkills = technicalSkills ?? [];
   }
 }

@@ -19,11 +19,16 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   final _picker = ImagePicker();
   String? _photoPath;
 
-  final List<String> _allTags = [
+  final List<String> _allSkills = [
     'Flutter', 'React Native', 'Web3', 'Blockchain', 'UI/UX', 'Firebase',
     'Machine Learning', 'Python', 'Java', 'C++', 'IoT', 'Embedded Systems',
     'Cyber Security', 'Cloud Computing', 'DevOps', 'Android', 'iOS',
     'Data Science', 'AR/VR', 'Game Dev',
+  ];
+
+  final List<String> _allHobbies = [
+    'Photography', 'Gaming', 'Reading', 'Music', 'Sports', 'Traveling',
+    'Cooking', 'Art/Design', 'Writing', 'Fitness'
   ];
 
   final List<String> _allGoals = [
@@ -34,7 +39,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     'Project Building',
   ];
 
-  final Set<String> _selectedTags = {};
+  final Set<String> _selectedSkills = {};
+  final Set<String> _selectedHobbies = {};
   final Set<String> _selectedGoals = {};
 
   String _prefGender = 'Any';
@@ -49,7 +55,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     if (user != null) {
       _bioCtrl.text = user.bio;
       _photoPath = user.photoPath.isEmpty ? null : user.photoPath;
-      _selectedTags.addAll(user.tags);
+      _selectedSkills.addAll(user.technicalSkills);
+      _selectedHobbies.addAll(user.hobbies);
       _selectedGoals.addAll(user.goals);
       _prefGender = user.prefGender;
       _prefYear = user.prefYear;
@@ -68,12 +75,23 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   }
 
   Future<void> _save() async {
+    if (_photoPath == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile picture is compulsory.', style: GoogleFonts.outfit()), backgroundColor: Colors.red));
+      return;
+    }
+    if (_selectedSkills.isEmpty || _selectedHobbies.isEmpty || _bioCtrl.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please fill your bio, skills, and hobbies.', style: GoogleFonts.outfit()), backgroundColor: Colors.red));
+      return;
+    }
+
     final provider = context.read<AppProvider>();
     final user = provider.currentUser;
     if (user == null) return;
     user.bio = _bioCtrl.text.trim();
     user.photoPath = _photoPath ?? '';
-    user.tags = _selectedTags.toList();
+    user.technicalSkills = _selectedSkills.toList();
+    user.hobbies = _selectedHobbies.toList();
+    user.tags = [..._selectedSkills, ..._selectedHobbies].toList();
     user.goals = _selectedGoals.toList();
     user.prefGender = _prefGender;
     user.prefYear = _prefYear;
@@ -105,7 +123,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
               SliverToBoxAdapter(child: _buildHeaderBar()),
               SliverToBoxAdapter(child: _buildPhotoSection()),
               SliverToBoxAdapter(child: _buildBioSection()),
-              SliverToBoxAdapter(child: _buildTagsSection()),
+              SliverToBoxAdapter(child: _buildSkillsSection()),
+              SliverToBoxAdapter(child: _buildHobbiesSection()),
               SliverToBoxAdapter(child: _buildGoalsSection()),
               SliverToBoxAdapter(child: _buildPreferencesToggle()),
               if (_showPrefs) SliverToBoxAdapter(child: _buildPreferencesSection()),
@@ -190,11 +209,11 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     );
   }
 
-  Widget _buildTagsSection() {
+  Widget _buildSkillsSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _sectionTitle('Academic Tags', Icons.tag_rounded),
+        _sectionTitle('Technical Skills', Icons.code_rounded),
         const SizedBox(height: 4),
         Text('Select your tech stack & areas of expertise',
             style: GoogleFonts.outfit(color: const Color(0xFF7070A0), fontSize: 12)),
@@ -202,15 +221,48 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: _allTags.map((tag) {
-            final selected = _selectedTags.contains(tag);
+          children: _allSkills.map((skill) {
+            final selected = _selectedSkills.contains(skill);
             return FilterChip(
-              label: Text(tag),
+              label: Text(skill),
               selected: selected,
-              onSelected: (v) => setState(() => v ? _selectedTags.add(tag) : _selectedTags.remove(tag)),
+              onSelected: (v) => setState(() => v ? _selectedSkills.add(skill) : _selectedSkills.remove(skill)),
               selectedColor: const Color(0xFFB026FF).withValues(alpha: 0.2),
               checkmarkColor: const Color(0xFF00E5FF),
               side: BorderSide(color: selected ? const Color(0xFFB026FF) : Colors.white.withValues(alpha: 0.08)),
+              labelStyle: GoogleFonts.outfit(
+                color: selected ? Colors.white : const Color(0xFFA0A0C0),
+                fontSize: 12,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+              ),
+            );
+          }).toList(),
+        ),
+      ]),
+    );
+  }
+
+  Widget _buildHobbiesSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        _sectionTitle('Interests & Hobbies', Icons.palette_rounded),
+        const SizedBox(height: 4),
+        Text('What do you like to do outside of coding?',
+            style: GoogleFonts.outfit(color: const Color(0xFF7070A0), fontSize: 12)),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _allHobbies.map((hobby) {
+            final selected = _selectedHobbies.contains(hobby);
+            return FilterChip(
+              label: Text(hobby),
+              selected: selected,
+              onSelected: (v) => setState(() => v ? _selectedHobbies.add(hobby) : _selectedHobbies.remove(hobby)),
+              selectedColor: const Color(0xFF00E5FF).withValues(alpha: 0.2),
+              checkmarkColor: const Color(0xFF00E5FF),
+              side: BorderSide(color: selected ? const Color(0xFF00E5FF) : Colors.white.withValues(alpha: 0.08)),
               labelStyle: GoogleFonts.outfit(
                 color: selected ? Colors.white : const Color(0xFFA0A0C0),
                 fontSize: 12,

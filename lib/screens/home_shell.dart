@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'dart:ui';
 import '../providers/app_provider.dart';
 import 'discovery_stack_screen.dart';
 import 'matches_screen.dart';
@@ -66,35 +68,46 @@ class _HomeShellState extends State<HomeShell> {
       body: IndexedStack(index: _index, children: _screens),
       bottomNavigationBar: Container(
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.02),
+        child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.6), blurRadius: 20, offset: const Offset(0, 8))],
-        ),
-        child: NavigationBar(
-          backgroundColor: Colors.transparent,
-          indicatorColor: const Color(0xFFB026FF).withValues(alpha: 0.2),
-          selectedIndex: _index,
-          onDestinationSelected: (i) => setState(() => _index = i),
-          destinations: [
-            const NavigationDestination(
-              icon: Icon(Icons.explore_rounded, color: Color(0xFFA0A0C0)),
-              selectedIcon: Icon(Icons.explore_rounded, color: Color(0xFFB026FF)),
-              label: 'Discover',
-            ),
-            NavigationDestination(
-              icon: Consumer<AppProvider>(
-                builder: (_, p, __) => Badge(
-                  isLabelVisible: p.matches.isNotEmpty,
-                  label: Text('${p.matches.length}'),
-                  child: const Icon(Icons.favorite_rounded, color: Color(0xFFA0A0C0)),
-                ),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.6), blurRadius: 20, offset: const Offset(0, 8))],
               ),
-              selectedIcon: const Icon(Icons.favorite_rounded, color: Color(0xFFB026FF)),
-              label: 'Synergies',
+              child: NavigationBar(
+                backgroundColor: Colors.transparent,
+                indicatorColor: const Color(0xFFB026FF).withValues(alpha: 0.3),
+                selectedIndex: _index,
+                onDestinationSelected: (i) {
+                  HapticFeedback.lightImpact();
+                  setState(() => _index = i);
+                },
+                destinations: [
+                  const NavigationDestination(
+                    icon: Icon(Icons.explore_rounded, color: Color(0xFFA0A0C0)),
+                    selectedIcon: Icon(Icons.explore_rounded, color: Color(0xFF00E5FF)),
+                    label: 'Discover',
+                  ),
+                  NavigationDestination(
+                    icon: Consumer<AppProvider>(
+                      builder: (_, p, __) => Badge(
+                        isLabelVisible: p.matches.isNotEmpty,
+                        label: Text('${p.matches.length}'),
+                        child: const Icon(Icons.favorite_rounded, color: Color(0xFFA0A0C0)),
+                      ),
+                    ),
+                    selectedIcon: const Icon(Icons.favorite_rounded, color: Color(0xFFB026FF)),
+                    label: 'Synergies',
+                  ),
+                ],
+              ),
             ),
-          ],
+          ),
         ),
       ),
     );

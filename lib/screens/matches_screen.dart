@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../providers/app_provider.dart';
 import '../models/match_model.dart';
 import 'chat_screen.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class MatchesScreen extends StatelessWidget {
   const MatchesScreen({super.key});
@@ -34,7 +35,7 @@ class MatchesScreen extends StatelessWidget {
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
       itemCount: matches.length,
-      itemBuilder: (ctx, i) => _MatchTile(match: matches[i]),
+      itemBuilder: (ctx, i) => _MatchTile(match: matches[i], index: i),
     );
   }
 
@@ -50,7 +51,7 @@ class MatchesScreen extends StatelessWidget {
             border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
           ),
           child: const Icon(Icons.favorite_border_rounded, color: Color(0xFFB026FF), size: 40),
-        ),
+        ).animate(onPlay: (c) => c.repeat(reverse: true)).scaleXY(end: 1.1, duration: 1500.ms, curve: Curves.easeInOut),
         const SizedBox(height: 20),
         Text('No Synergies Yet', style: GoogleFonts.outfit(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
         const SizedBox(height: 8),
@@ -64,7 +65,8 @@ class MatchesScreen extends StatelessWidget {
 
 class _MatchTile extends StatelessWidget {
   final MatchModel match;
-  const _MatchTile({required this.match});
+  final int index;
+  const _MatchTile({required this.match, required this.index});
 
   String get _lastMessage {
     if (match.messages.isEmpty) return 'Tap to open encrypted tunnel';
@@ -135,6 +137,6 @@ class _MatchTile extends StatelessWidget {
         trailing: const Icon(Icons.lock_rounded, color: Color(0xFFB026FF), size: 16),
         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(match: match))),
       ),
-    );
+    ).animate().fadeIn(delay: Duration(milliseconds: 100 + (index * 50))).slideX(begin: 0.1, curve: Curves.easeOut);
   }
 }

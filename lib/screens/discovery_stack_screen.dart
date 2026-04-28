@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:appinio_swiper/appinio_swiper.dart';
@@ -98,11 +99,13 @@ class _DiscoveryStackScreenState extends State<DiscoveryStackScreen> {
               try {
                 final peer = peers[prevIndex];
                 if (activity.direction == AxisDirection.right) {
+                  HapticFeedback.mediumImpact();
                   final match = await provider.likePeer(peer);
                   if (match != null && mounted) {
                     await Navigator.push(context, MaterialPageRoute(builder: (_) => SynergyScreen(match: match)));
                   }
                 } else if (activity.direction == AxisDirection.left) {
+                  HapticFeedback.lightImpact();
                   provider.passPeer(peer);
                 }
               } finally {
@@ -132,21 +135,30 @@ class _DiscoveryStackScreenState extends State<DiscoveryStackScreen> {
             color: Colors.redAccent,
             size: 60,
             label: 'Skip',
-            onTap: () => _ctrl.swipeLeft(),
+            onTap: () {
+              HapticFeedback.lightImpact();
+              _ctrl.swipeLeft();
+            },
           ),
           _actionButton(
             icon: Icons.bolt_rounded,
             color: const Color(0xFF00E5FF),
             size: 44,
             label: 'Super',
-            onTap: () => _ctrl.swipeRight(),
+            onTap: () {
+              HapticFeedback.heavyImpact();
+              _ctrl.swipeRight();
+            },
           ),
           _actionButton(
             icon: Icons.link_rounded,
             color: Colors.greenAccent,
             size: 60,
             label: 'Link',
-            onTap: () => _ctrl.swipeRight(),
+            onTap: () {
+              HapticFeedback.mediumImpact();
+              _ctrl.swipeRight();
+            },
           ),
         ],
       ),

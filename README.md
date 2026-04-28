@@ -13,10 +13,15 @@ By leveraging **Mesh-Networking (Nearby Connections)** coupled with an invisible
 
 ## ✨ Core Features
 - **Sybil-Resistant Registration**: Accounts strictly bound to 8-digit collegiate PRNs.
-- **Sleek Dark Neon UI**: A highly responsive, 60fps-capable deep-space neon motif designed to reduce eye strain while looking impeccably modern.
+- **Premium Glassmorphism UI**: A sleek, frosted-glass dark neon motif that reduces eye strain, complete with continuous micro-animations.
+- **Physical Haptics**: Deeply integrated haptic feedback for a highly responsive, physical feel.
 - **Proximity Radar (P2P)**: Offline-capable peer discovery utilizing Bluetooth and WiFi-Direct technologies.
-- **Algorithmic Matchmaking**: Find specific connections based on Branches, Year (FY/SY/TY/BTech), and Collaboration Goals (e.g., *Looking for Hackathon Teammates*).
-- **Secure Encrypted Tunnels**: Real-time peer-to-peer chatting capabilities between matched nodes.
+- **Algorithmic Matchmaking**: Find connections based on Branches, Year, Skills, Hobbies, and Goals.
+- **Real-time WebSockets Chat**: Instantaneous message syncing via Firebase Firestore streams, featuring dynamic Pro-level chat bubbles with timestamps.
+
+## 🚀 Download Latest APK
+You can find the latest compiled Android APK in the `releases/` directory:
+- [VITality_v1.0.apk](releases/VITality_v1.0.apk)
 
 ## ⚙️ Quick Start Installation
 

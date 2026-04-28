@@ -2,6 +2,10 @@
 
 part of 'user_model.dart';
 
+// **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
+
 class UserModelAdapter extends TypeAdapter<UserModel> {
   @override
   final int typeId = 0;
@@ -19,20 +23,22 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       gender: fields[3] as String,
       year: fields[4] as String,
       branch: fields[5] as String,
-      bio: fields[6] as String? ?? '',
-      photoPath: fields[7] as String? ?? '',
-      tags: (fields[8] as List?)?.cast<String>() ?? [],
-      goals: (fields[9] as List?)?.cast<String>() ?? [],
-      prefGender: fields[10] as String? ?? 'Any',
-      prefYear: fields[11] as String? ?? 'Any',
-      jwtToken: fields[12] as String? ?? '',
+      bio: fields[6] as String,
+      photoPath: fields[7] as String,
+      tags: (fields[8] as List?)?.cast<String>(),
+      goals: (fields[9] as List?)?.cast<String>(),
+      prefGender: fields[10] as String,
+      prefYear: fields[11] as String,
+      jwtToken: fields[12] as String,
+      hobbies: (fields[13] as List?)?.cast<String>(),
+      technicalSkills: (fields[14] as List?)?.cast<String>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, UserModel obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(15)
       ..writeByte(0)
       ..write(obj.prn)
       ..writeByte(1)
@@ -58,7 +64,11 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       ..writeByte(11)
       ..write(obj.prefYear)
       ..writeByte(12)
-      ..write(obj.jwtToken);
+      ..write(obj.jwtToken)
+      ..writeByte(13)
+      ..write(obj.hobbies)
+      ..writeByte(14)
+      ..write(obj.technicalSkills);
   }
 
   @override

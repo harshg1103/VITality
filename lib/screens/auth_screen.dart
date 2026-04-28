@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'dart:ui';
 import '../providers/app_provider.dart';
 import 'profile_setup_screen.dart';
 
@@ -296,19 +297,36 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
     int? maxLength,
     TextInputType? keyboardType,
   }) {
-    return TextField(
-      controller: controller,
-      obscureText: obscure,
-      inputFormatters: inputFormatters,
-      maxLength: maxLength,
-      keyboardType: keyboardType,
-      style: GoogleFonts.outfit(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        prefixIcon: Icon(icon, color: const Color(0xFFB026FF), size: 20),
-        suffixIcon: suffixIcon,
-        counterText: '',
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.05),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: TextField(
+            controller: controller,
+            obscureText: obscure,
+            inputFormatters: inputFormatters,
+            maxLength: maxLength,
+            keyboardType: keyboardType,
+            style: GoogleFonts.outfit(color: Colors.white),
+            decoration: InputDecoration(
+              labelText: label,
+              labelStyle: GoogleFonts.outfit(color: const Color(0xFF7070A0)),
+              hintText: hint,
+              hintStyle: GoogleFonts.outfit(color: const Color(0xFF505070)),
+              prefixIcon: Icon(icon, color: const Color(0xFFB026FF), size: 20),
+              suffixIcon: suffixIcon,
+              counterText: '',
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -396,6 +414,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
   }
 
   Future<void> _handleLogin() async {
+    HapticFeedback.lightImpact();
     context.read<AppProvider>().clearError();
     final prn = _loginPrn.text.trim();
     final pass = _loginPass.text;
@@ -409,11 +428,26 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
   }
 
   Future<void> _handleRegister() async {
+    HapticFeedback.lightImpact();
     context.read<AppProvider>().clearError();
+    final prn = _regPrn.text.trim();
+    final name = _regName.text.trim();
+    final pass = _regPass.text;
+    
+    if (prn.isEmpty || name.isEmpty || pass.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please fill all required fields.', style: GoogleFonts.outfit()),
+          backgroundColor: Colors.red.withValues(alpha: 0.8),
+        ),
+      );
+      return;
+    }
+
     final ok = await context.read<AppProvider>().register(
-      prn: _regPrn.text.trim(),
-      name: _regName.text.trim(),
-      password: _regPass.text,
+      prn: prn,
+      name: name,
+      password: pass,
       gender: _regGender,
       year: _regYear,
       branch: _regBranch,
