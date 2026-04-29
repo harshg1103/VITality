@@ -5,8 +5,10 @@ import '../models/match_model.dart';
 class DatabaseService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  DatabaseService() {
-    _db.settings = const Settings(persistenceEnabled: true);
+  List<String> _parseList(dynamic value) {
+    if (value == null) return [];
+    if (value is Iterable) return value.map((e) => e.toString()).toList();
+    return [value.toString()];
   }
 
   Future<void> saveUser(UserModel user) async {
@@ -38,21 +40,21 @@ class DatabaseService {
       if (!doc.exists) return null;
       final data = doc.data()!;
       final user = UserModel(
-        prn: data['prn'] ?? prn,
-        name: data['name'] ?? '',
+        prn: data['prn']?.toString() ?? prn,
+        name: data['name']?.toString() ?? '',
         password: '', // Kept secure via FirebaseAuth
-        gender: data['gender'] ?? '',
-        year: data['year'] ?? '',
-        branch: data['branch'] ?? '',
+        gender: data['gender']?.toString() ?? '',
+        year: data['year']?.toString() ?? '',
+        branch: data['branch']?.toString() ?? '',
       );
-      user.bio = data['bio'] ?? '';
-      user.tags = List<String>.from(data['tags'] ?? []);
-      user.goals = List<String>.from(data['goals'] ?? []);
-      user.hobbies = List<String>.from(data['hobbies'] ?? []);
-      user.technicalSkills = List<String>.from(data['technicalSkills'] ?? []);
-      user.prefGender = data['prefGender'] ?? 'Any';
-      user.prefYear = data['prefYear'] ?? 'Any';
-      user.photoPath = data['photoPath'] ?? '';
+      user.bio = data['bio']?.toString() ?? '';
+      user.tags = _parseList(data['tags']);
+      user.goals = _parseList(data['goals']);
+      user.hobbies = _parseList(data['hobbies']);
+      user.technicalSkills = _parseList(data['technicalSkills']);
+      user.prefGender = data['prefGender']?.toString() ?? 'Any';
+      user.prefYear = data['prefYear']?.toString() ?? 'Any';
+      user.photoPath = data['photoPath']?.toString() ?? '';
       return user;
     } catch (e) {
       throw Exception('DatabaseService.getUser failed: $e');
