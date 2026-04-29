@@ -28,7 +28,13 @@ class DatabaseService {
         'prefYear': user.prefYear,
         'photoPath': user.photoPath,
         'isAdmin': user.prn == '12413129', // Admin Privileges
-      }, SetOptions(merge: true));
+      }, SetOptions(merge: true)).timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          // Resolve the future locally. Firestore will sync this in the background!
+          return;
+        },
+      );
     } catch (e) {
       throw Exception('DatabaseService.saveUser failed: $e');
     }
