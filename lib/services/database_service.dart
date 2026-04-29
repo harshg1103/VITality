@@ -5,84 +5,108 @@ import '../models/match_model.dart';
 class DatabaseService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  DatabaseService() {
+    _db.settings = const Settings(persistenceEnabled: true);
+  }
+
   Future<void> saveUser(UserModel user) async {
-    await _db.collection('users').doc(user.prn).set({
-      'prn': user.prn,
-      'name': user.name,
-      'gender': user.gender,
-      'year': user.year,
-      'branch': user.branch,
-      'bio': user.bio,
-      'tags': user.tags,
-      'goals': user.goals,
-      'hobbies': user.hobbies,
-      'technicalSkills': user.technicalSkills,
-      'prefGender': user.prefGender,
-      'prefYear': user.prefYear,
-      'photoPath': user.photoPath,
-      'isAdmin': user.prn == '12413129', // Admin Privileges
-    }, SetOptions(merge: true));
+    try {
+      await _db.collection('users').doc(user.prn).set({
+        'prn': user.prn,
+        'name': user.name,
+        'gender': user.gender,
+        'year': user.year,
+        'branch': user.branch,
+        'bio': user.bio,
+        'tags': user.tags,
+        'goals': user.goals,
+        'hobbies': user.hobbies,
+        'technicalSkills': user.technicalSkills,
+        'prefGender': user.prefGender,
+        'prefYear': user.prefYear,
+        'photoPath': user.photoPath,
+        'isAdmin': user.prn == '12413129', // Admin Privileges
+      }, SetOptions(merge: true));
+    } catch (e) {
+      throw Exception('DatabaseService.saveUser failed: $e');
+    }
   }
 
   Future<UserModel?> getUser(String prn) async {
-    final doc = await _db.collection('users').doc(prn).get();
-    if (!doc.exists) return null;
-    final data = doc.data()!;
-    final user = UserModel(
-      prn: data['prn'] ?? prn,
-      name: data['name'] ?? '',
-      password: '', // Kept secure via FirebaseAuth
-      gender: data['gender'] ?? '',
-      year: data['year'] ?? '',
-      branch: data['branch'] ?? '',
-    );
-    user.bio = data['bio'] ?? '';
-    user.tags = List<String>.from(data['tags'] ?? []);
-    user.goals = List<String>.from(data['goals'] ?? []);
-    user.hobbies = List<String>.from(data['hobbies'] ?? []);
-    user.technicalSkills = List<String>.from(data['technicalSkills'] ?? []);
-    user.prefGender = data['prefGender'] ?? 'Any';
-    user.prefYear = data['prefYear'] ?? 'Any';
-    user.photoPath = data['photoPath'] ?? '';
-    return user;
-  }
-
-  Future<List<UserModel>> getAllUsers() async {
-    final snapshot = await _db.collection('users').get();
-    final users = <UserModel>[];
-    for (var doc in snapshot.docs) {
-      final data = doc.data();
+    try {
+      final doc = await _db.collection('users').doc(prn).get();
+      if (!doc.exists) return null;
+      final data = doc.data()!;
       final user = UserModel(
-        prn: data['prn'] ?? '',
+        prn: data['prn'] ?? prn,
         name: data['name'] ?? '',
-        password: '',
+        password: '', // Kept secure via FirebaseAuth
         gender: data['gender'] ?? '',
         year: data['year'] ?? '',
         branch: data['branch'] ?? '',
       );
-      users.add(user);
+      user.bio = data['bio'] ?? '';
+      user.tags = List<String>.from(data['tags'] ?? []);
+      user.goals = List<String>.from(data['goals'] ?? []);
+      user.hobbies = List<String>.from(data['hobbies'] ?? []);
+      user.technicalSkills = List<String>.from(data['technicalSkills'] ?? []);
+      user.prefGender = data['prefGender'] ?? 'Any';
+      user.prefYear = data['prefYear'] ?? 'Any';
+      user.photoPath = data['photoPath'] ?? '';
+      return user;
+    } catch (e) {
+      throw Exception('DatabaseService.getUser failed: $e');
     }
-    return users;
+  }
+
+  Future<List<UserModel>> getAllUsers() async {
+    try {
+      final snapshot = await _db.collection('users').get();
+      final users = <UserModel>[];
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        final user = UserModel(
+          prn: data['prn'] ?? '',
+          name: data['name'] ?? '',
+          password: '',
+          gender: data['gender'] ?? '',
+          year: data['year'] ?? '',
+          branch: data['branch'] ?? '',
+        );
+        users.add(user);
+      }
+      return users;
+    } catch (e) {
+      throw Exception('DatabaseService.getAllUsers failed: $e');
+    }
   }
 
   Future<void> saveMatch(MatchModel match) async {
-    await _db.collection('matches').doc(match.matchId).set({
-      'matchId': match.matchId,
-      'peerPrn': match.peerPrn,
-      'peerName': match.peerName,
-      'timestamp': match.timestamp,
-    }, SetOptions(merge: true));
+    try {
+      await _db.collection('matches').doc(match.matchId).set({
+        'matchId': match.matchId,
+        'peerPrn': match.peerPrn,
+        'peerName': match.peerName,
+        'timestamp': match.timestamp,
+      }, SetOptions(merge: true));
+    } catch (e) {
+      throw Exception('DatabaseService.saveMatch failed: $e');
+    }
   }
 
   Future<void> addMessage(String matchId, String message) async {
-    await _db
-        .collection('matches')
-        .doc(matchId)
-        .collection('messages')
-        .add({
-      'text': message,
-      'timestamp': FieldValue.serverTimestamp(),
-    });
+    try {
+      await _db
+          .collection('matches')
+          .doc(matchId)
+          .collection('messages')
+          .add({
+        'text': message,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      throw Exception('DatabaseService.addMessage failed: $e');
+    }
   }
 
   Stream<QuerySnapshot> getAllMatches() {

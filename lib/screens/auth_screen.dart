@@ -91,21 +91,19 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
       child: Column(
         children: [
           Container(
-            width: 72,
-            height: 72,
+            width: 80,
+            height: 80,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
-              gradient: const LinearGradient(
-                colors: [Color(0xFFB026FF), Color(0xFF00E5FF)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
               boxShadow: [
                 BoxShadow(color: const Color(0xFFB026FF).withValues(alpha: 0.4), blurRadius: 24, spreadRadius: 4),
               ],
               border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 1.5),
             ),
-            child: const Icon(Icons.hub_rounded, color: Colors.white, size: 36),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(22.5),
+              child: Image.asset('assets/images/app_icon.png', fit: BoxFit.cover),
+            ),
           ).animate().scale(duration: 600.ms, curve: Curves.elasticOut),
           const SizedBox(height: 16),
           Text(

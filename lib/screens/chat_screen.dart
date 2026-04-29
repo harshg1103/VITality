@@ -66,6 +66,13 @@ class _ChatScreenState extends State<ChatScreen> {
                   return const Center(child: CircularProgressIndicator(color: Color(0xFFB026FF)));
                 }
                 
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Network unstable. Establishing connection...',
+                        style: GoogleFonts.outfit(color: const Color(0xFF7070A0), fontSize: 13)),
+                  );
+                }
+                
                 final docs = snapshot.data?.docs ?? [];
                 
                 // Convert docs to a list of messages with timestamps
